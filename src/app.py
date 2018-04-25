@@ -11,7 +11,7 @@ app.config['JSON_SORT_KEYS'] = False
 app.secret_key = 'key'
 
 
-@app.route('{}/classify'.format(PREFIX), methods=['POST'])
+@app.route('{}/image/classify'.format(PREFIX), methods=['POST'])
 def classify():
     nparr = np.fromstring(request.data, np.uint8)
     out_image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -33,6 +33,19 @@ def classify():
     response.headers['Content-Type'] = 'image/jpeg'
 
     return response
+
+
+@app.route('{}/person/add/<name>'.format(PREFIX), methods=['POST'])
+def add_person(name):
+    nparr = np.fromstring(request.data, np.uint8)
+    out_image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    faces, bounding_boxes = detection.extract_faces_from_image(out_image)
+    if faces is not None and bounding_boxes is not None:
+        nrof_faces = len(faces)
+        embeddings = recognition.retrieve_embeddings_for_face_list(faces)
+
+        recognition.add_person(name, embeddings[0])
 
 
 if __name__ == '__main__':

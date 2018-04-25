@@ -12,7 +12,7 @@ class FaceDetection:
     THRESHOLD = [0.6, 0.7, 0.7]  # Three steps's threshold
     FACTOR = 0.709  # Scale factor
 
-    def __init__(self, gpu_memory_fraction: float =0.2):
+    def __init__(self, gpu_memory_fraction: float = 0.2):
         """Face detection class initialisation
 
         :param gpu_memory_fraction: The upperbound of GPU memory that can be used for face detection (default=20%)
@@ -33,7 +33,7 @@ class FaceDetection:
 
         return pnet, rnet, onet
 
-    def extract_faces_from_image(self, image: np.ndarray, image_size: int =160, margin: int =44):
+    def extract_faces_from_image(self, image: np.ndarray, image_size: int = 160, margin: int = 44):
         """Find and extracts all faces in an image
 
         :param image: The target frame (image) to find faces in
@@ -71,7 +71,7 @@ class FaceDetection:
 
 
 class FaceRecognition:
-    def __init__(self, pb_model_location: str, gpu_memory_fraction: float =0.6):
+    def __init__(self, pb_model_location: str, gpu_memory_fraction: float = 0.6):
         """Face recognition class initialisation
 
         :param pb_model_location: Frozen (.pb) facenet model location on disk
@@ -98,20 +98,35 @@ class FaceRecognition:
         return emb_array
 
     def classify_person(self, unknown_embeddings):
-        know_embeddings = np.load('models/known_persons.npy')
+        try:
+            know_embeddings = np.load('models/known_persons.npy').item()
+        except IOError:
+            return 'Unknown'
         lowest_dist = 2
         name = ''
 
-        for person in know_embeddings.item():
+        for person in know_embeddings:
             for i in range(len(unknown_embeddings)):
                 dist = np.sqrt(
-                    np.sum(np.square(np.subtract(unknown_embeddings[i], know_embeddings.item().get(person)))))
+                    np.sum(np.square(np.subtract(unknown_embeddings[i], know_embeddings.get(person)))))
                 if dist < lowest_dist:
                     name = person
                     lowest_dist = dist
-
 
         if lowest_dist < 1:
             return name
         else:
             return 'Unknown'
+
+    def add_person(self, name, embedding):
+        try:
+            know_embeddings = np.load('models/known_persons.npy').item()
+        except IOError:
+            know_embeddings = {}
+
+        if name in know_embeddings:
+            know_embeddings.update({name: embedding})
+        else:
+            know_embeddings[name] = embedding
+
+        np.save('models/known_persons.npy', know_embeddings)

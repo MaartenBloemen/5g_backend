@@ -97,21 +97,21 @@ class FaceRecognition:
         emb_array = self.sess.run(self.embeddings, feed_dict=feed_dict)
         return emb_array
 
-    def find_best_3_candidates(self, unknown_embeddings):
+    def classify_person(self, unknown_embeddings):
         know_embeddings = np.load('/home/maarten/PycharmProjects/5g_backend/src/models/embeddings.npy')
-        names = []
+        lowest_dist = 2
+        name = ''
+
         for person in know_embeddings.item():
             for i in range(len(unknown_embeddings)):
-                dist = np.sqrt(np.sum(np.square(np.subtract(unknown_embeddings[i], know_embeddings.item().get(person)))))
-                possibility = {'name': person, 'index': i, 'dist': dist}
-                names.append(possibility)
+                dist = np.sqrt(
+                    np.sum(np.square(np.subtract(unknown_embeddings[i], know_embeddings.item().get(person)))))
+                if dist < lowest_dist:
+                    name = person
+                    lowest_dist = dist
 
-        getIndex, getDist = lambda a: a['index'], lambda a: a['dist']
-        groups = itertools.groupby(sorted(names, key=getIndex), key=getIndex)
-        m = [min(b, key=getDist) for a, b in groups]
-        namesCleaned = [l for l in names if l in m]
-        return namesCleaned[:3]
 
-    def classify_embeddings_against_support_vector(self, name, embeddings):
-        with open('models/{}.pkl'.format(name), 'rb') as infile:
-            (model_pkl, class_names) = pickle.load(infile)
+        if lowest_dist < 1:
+            return name
+        else:
+            return 'Unknown'

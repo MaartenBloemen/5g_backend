@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from flask import Flask, request, make_response
-from src.ai import FaceDetection, FaceRecognition
+from ai import FaceDetection, FaceRecognition
 
 PREFIX = '/api/v1/5g'
 
@@ -37,5 +37,5 @@ def classify():
 
 if __name__ == '__main__':
     detection = FaceDetection()
-    recognition = FaceRecognition('models/facenet.pb')
+    recognition = FaceRecognition('models/frozen_graph.pb')
     app.run(host='0.0.0.0', port=8080)

@@ -3,8 +3,8 @@ import pickle
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-from src.dependencies import facenet
-from src.dependencies import detect_face
+from dependencies import facenet
+from dependencies import detect_face
 
 
 class FaceDetection:
@@ -98,7 +98,7 @@ class FaceRecognition:
         return emb_array
 
     def classify_person(self, unknown_embeddings):
-        know_embeddings = np.load('models/embeddings.npy')
+        know_embeddings = np.load('models/known_persons.npy')
         lowest_dist = 2
         name = ''
 

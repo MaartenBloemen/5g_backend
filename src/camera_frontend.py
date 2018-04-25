@@ -14,14 +14,14 @@ def main(args):
         if camera.read() is not None:
             frame = cv2.resize(camera.read(), (1280, 720))
             _, img_encoded = cv2.imencode('.jpg', frame)
-            request = requests.post('http://{}/classify'.format(args.backend_url), data=img_encoded.tostring(),
+            request = requests.post('http://{}/image/classify'.format(args.backend_url), data=img_encoded.tostring(),
                                      headers=headers)
 
             if request.status_code == 200:
                 nparr = np.fromstring(request.content, np.uint8)
                 classified_img = cv2.cvtColor(cv2.imdecode(nparr, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGBA)
                 cv2.imshow('Classified image', cv2.cvtColor(classified_img, cv2.COLOR_BGR2RGBA))
-                print('Time to classify frame in milliseconds: {}'.format(round(request.elapsed.total_seconds()/1000, 6)))
+                print('Time to classify frame in seconds: {}'.format(round(request.elapsed.total_seconds(), 6)))
 
                 if cv2.waitKey(1) == 27:
                     camera.stop()

@@ -98,7 +98,7 @@ class FaceRecognition:
         return emb_array
 
     def classify_person(self, unknown_embeddings):
-        know_embeddings = np.load('/home/maarten/PycharmProjects/5g_backend/src/models/embeddings.npy')
+        know_embeddings = np.load('models/embeddings.npy')
         lowest_dist = 2
         name = ''
 

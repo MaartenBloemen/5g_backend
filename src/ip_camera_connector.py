@@ -14,7 +14,7 @@ class IpCamVideoStream:
         try:
             auth = '{}:{}'.format(name, password)
             base64auth = base64.standard_b64encode(auth.encode('utf-8'))
-            self.request = urllib.request.Request(url)
+            self.request = urllib.request.Request('http://{}'.format(url))
             self.request.add_header('Authorization', 'Basic {}'.format(base64auth.decode('utf-8')))
             self.camera_stream = urllib.request.urlopen(self.request)
         except Exception as e:
